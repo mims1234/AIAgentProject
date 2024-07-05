@@ -24,7 +24,7 @@ async function generateResponse(model, prompt, temperature, topP) {
       top_p: topP
     });
     return response.choices[0].message.content;
-  } else if (groqModels.includes(model)) {
+  } else {
     const response = await groq.chat.completions.create({
       model: model,
       messages: [{ role: "user", content: prompt }],
@@ -32,35 +32,28 @@ async function generateResponse(model, prompt, temperature, topP) {
       top_p: topP
     });
     return response.choices[0].message.content;
-  } else {
-    throw new Error('Invalid model selected');
-  }
+  } 
 }
 
 async function getAvailableModels() {
-  let models = [];
+  const openAIModels = [
+    { name: 'gpt-3.5-turbo', provider: 'openai' },
+    { name: 'gpt-4', provider: 'openai' },
+    { name: 'gpt-4-32k', provider: 'openai' },
+    { name: 'gpt-4o', provider: 'openai' }
+  ];
   
-  // Fetch OpenAI models
+  let groqModels = [];
   try {
-    const openAIModels = await openai.models.list();
-    models = models.concat(openAIModels.data
-      .filter(model => model.id.startsWith('gpt') && !model.id.includes('instruct'))
-      .map(model => ({ name: model.id, provider: 'openai' })));
-  } catch (error) {
-    console.error('Error fetching OpenAI models:', error);
-  }
-  
-  // Add Groq models
-  try {
-    const groqModels = await groq.models.list();
-    models = models.concat(groqModels.data
+    const groqModelList = await groq.models.list();
+    groqModels = groqModelList.data
       .filter(model => !model.id.includes('whisper'))
-      .map(model => ({ name: model.id, provider: 'groq' })));
+      .map(model => ({ name: model.id, provider: 'groq' }));
   } catch (error) {
-    console.error('Error fetching OpenAI models:', error);
+    console.error('Error fetching Groq models:', error);
   }
 
-  return models;
+  return [...groqModels, ...openAIModels];
 }
 
 module.exports = {
