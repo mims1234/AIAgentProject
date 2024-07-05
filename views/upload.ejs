@@ -1,0 +1,28 @@
+<h1>Document Upload</h1>
+
+<div id="uploadContainer">
+  <form id="urlForm">
+    <h2>Scrape URL</h2>
+    <input type="url" id="urlInput" placeholder="Enter URL to scrape" required>
+    <button type="submit">Scrape URL</button>
+  </form>
+
+  <form id="fileForm" enctype="multipart/form-data">
+    <h2>Upload File</h2>
+    <input type="file" id="fileInput" required>
+    <button type="submit">Upload File</button>
+  </form>
+
+  <div id="tokenCount"></div>
+
+  <div id="uploadedDocuments">
+    <h2>Uploaded Documents</h2>
+    <ul id="documentList">
+      <% documents.forEach(doc => { %>
+        <li><%= doc.name %> - Tokens: <%= doc.tokens %></li>
+      <% }); %>
+    </ul>
+  </div>
+</div>
+
+<script src="/js/upload.js"></script>
