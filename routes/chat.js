@@ -4,8 +4,8 @@ const { generateResponse } = require('../services/llmService');
 
 router.post('/', async (req, res) => {
   try {
-    const { model, message, temperature, topP } = req.body;
-    const response = await generateResponse(model, message, parseFloat(temperature), parseFloat(topP));
+    const { model, message, temperature, topP, chatHistory } = req.body;
+    const response = await generateResponse(model, message, parseFloat(temperature), parseFloat(topP), chatHistory);
     
     // Get the current timestamp
     const timestamp = new Date().toISOString();

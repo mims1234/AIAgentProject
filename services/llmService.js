@@ -15,11 +15,13 @@ try {
   console.log(`Cannot connect GROQ KEY in .env file`)
 }
 
-async function generateResponse(model, prompt, temperature, topP) {
+async function generateResponse(model, prompt, temperature, topP, chatHistory) {
+  const messages = [...chatHistory, { role: "user", content: prompt }];
+
   if (model.startsWith('gpt')) {
     const response = await openai.chat.completions.create({
       model: model,
-      messages: [{ role: "user", content: prompt }],
+      messages: messages,
       temperature: temperature,
       top_p: topP
     });
@@ -27,7 +29,7 @@ async function generateResponse(model, prompt, temperature, topP) {
   } else {
     const response = await groq.chat.completions.create({
       model: model,
-      messages: [{ role: "user", content: prompt }],
+      messages: messages,
       temperature: temperature,
       top_p: topP
     });

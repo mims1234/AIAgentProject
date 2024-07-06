@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const temperatureValue = document.getElementById('temperatureValue');
     const topPValue = document.getElementById('topPValue');
 
+    let chatHistory = [];
+
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const message = document.getElementById('messageInput').value;
@@ -17,11 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
         displayMessage('You', message, true);
         document.getElementById('messageInput').value = '';
 
+        // Add user message to chat history
+        chatHistory.push({ role: 'user', content: message });
+
         try {
             const response = await fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model, message, temperature, topP })
+                body: JSON.stringify({ model, message, temperature, topP, chatHistory })
             });
 
             if (!response.ok) {
@@ -30,6 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             displayMessage('AI', data.response, false, model, data.temperature, data.topP, data.tokens, data.timestamp);
+
+            // Add AI response to chat history
+            chatHistory.push({ role: 'assistant', content: data.response });
+
+            // Limit chat history to last 10 messages (adjust as needed)
+            if (chatHistory.length > 10) {
+                chatHistory = chatHistory.slice(-10);
+            }
         } catch (error) {
             console.error('Error:', error);
             displayMessage('Error', 'Failed to get response from AI');
